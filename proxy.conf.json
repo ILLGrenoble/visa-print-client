@@ -1,0 +1,12 @@
+{
+    "/ws/print/": {
+        "target": "http://localhost:8091",
+        "secure": false,
+        "pathRewrite": {
+            "^/ws/print/": "/socket.io/"
+        },
+        "changeOrigin": true,
+        "logLevel": "debug",
+        "ws": true
+    }
+}
