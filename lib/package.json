@@ -1,0 +1,29 @@
+{
+    "name": "@illgrenoble/visa-print-client",
+    "description": "",
+    "version": "1.0.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ILLGrenoble/visa-print-client.git"
+    },
+    "homepage": "https://github.com/ILLGrenoble/visa-print-client",
+    "license": "GPL-3.0",
+    "author": "Stuart Caunt <caunt@ill.fr>",
+    "keywords": [
+        "angularjs",
+        "angular",
+        "angular2",
+        "javascript",
+        "print",
+        "cups"
+    ],
+    "peerDependencies": {
+        "@angular/common": "^16.0.0",
+        "@angular/core": "^16.0.0"
+    },
+    "dependencies": {
+        "tslib": "^2.3.0"
+    },
+    "sideEffects": false,
+    "devDependencies": {}
+}

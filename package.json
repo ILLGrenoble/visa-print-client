@@ -1,39 +1,53 @@
 {
-  "name": "visa-print-client",
-  "version": "0.0.0",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve --proxy-config proxy.conf.json",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
-  },
-  "private": true,
-  "dependencies": {
-    "@angular/animations": "^17.0.0",
-    "@angular/common": "^17.0.0",
-    "@angular/compiler": "^17.0.0",
-    "@angular/core": "^17.0.0",
-    "@angular/forms": "^17.0.0",
-    "@angular/platform-browser": "^17.0.0",
-    "@angular/platform-browser-dynamic": "^17.0.0",
-    "@angular/router": "^17.0.0",
-    "rxjs": "~7.8.0",
-    "socket.io-client": "^4.7.2",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.14.2"
-  },
-  "devDependencies": {
-    "@angular-devkit/build-angular": "^17.0.3",
-    "@angular/cli": "^17.0.3",
-    "@angular/compiler-cli": "^17.0.0",
-    "@types/jasmine": "~5.1.0",
-    "jasmine-core": "~5.1.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.2.2"
-  }
+    "name": "@illgrenoble/visa-print-client",
+    "description": "",
+    "version": "1.O.0",
+    "scripts": {
+        "ng": "ng",
+        "start": "ng serve --proxy-config proxy.conf.json",
+        "build:lib": "ng build lib --configuration production",
+        "postbuild:lib": "cp ./README.md ./dist/lib && cp ./LICENSE ./dist/lib",
+        "watch": "ng build --watch --configuration development",
+        "watch:lib": "ng build lib --watch --configuration development",
+        "publish:lib": "npm run build:lib && npm publish ./dist/lib --access public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ILLGrenoble/visa-print-client.git"
+    },
+    "homepage": "https://github.com/ILLGrenoble/visa-print-client",
+    "license": "GPL-3.0",
+    "author": "Stuart Caunt <caunt@ill.fr>",
+    "files": [
+        "dist",
+        "LICENSE",
+        "README.md"
+    ],
+    "keywords": [
+        "angularjs",
+        "angular",
+        "angular2",
+        "javascript",
+        "print",
+        "cups"
+    ],
+    "dependencies": {
+        "@angular/common": "^16.0.0",
+        "@angular/compiler": "^16.0.0",
+        "@angular/core": "^16.0.0",
+        "@angular/platform-browser": "^16.0.0",
+        "@angular/platform-browser-dynamic": "^16.0.0",
+        "@angular/router": "^16.0.0",
+        "rxjs": "~7.8.0",
+        "socket.io-client": "^4.7.2",
+        "tslib": "^2.3.0",
+        "zone.js": "~0.13.0"
+    },
+    "devDependencies": {
+        "@angular-devkit/build-angular": "^16.0.6",
+        "@angular/cli": "~16.0.3",
+        "@angular/compiler-cli": "^16.0.0",
+        "ng-packagr": "^16.0.0",
+        "typescript": "~5.0.2"
+    }
 }

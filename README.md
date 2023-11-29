@@ -1,27 +1,18 @@
-# VisaPrintClient
+# VISA Print Client
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.3.
+This is an angular library providing a service to manage connections to a VISA Print Server.
 
-## Development server
+After connection and enabling the printing, PDFs are sent from the server via the websocket and rendered in a hidden iframe: after rendering the print dialog is opened from the iframe content.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-## Code scaffolding
+# Building the library
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```
+npm install
+npm build lib
+```
+# Running the demo
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```
+npm start
+```
