@@ -1,9 +1,9 @@
-export class JobProcessedEvent {
+export class PrintJobAvailableEvent {
     jobId: number;
     fileName: string;
     fileLength: number;
 
-    constructor(data?: Partial<JobProcessedEvent>) {
+    constructor(data?: Partial<PrintJobAvailableEvent>) {
         Object.assign(this, data);
     }
 }

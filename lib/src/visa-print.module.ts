@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import {VisaPrintService} from "./services/visa-print.service";
+import {VisaPrintService} from './services';
 
 @NgModule({
     declarations: [

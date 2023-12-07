@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {VisaPrintService} from 'lib';
+import {PrintJobAvailableEvent, VisaPrintService} from 'lib';
 
 @Component({
     selector: 'app-root',
@@ -21,6 +21,10 @@ export class AppComponent implements OnInit {
                this._connectionId = event.connectionId;
 
                this._printService.enablePrinting(this._connectionId);
+
+           } else if (event.type === 'PRINT_JOB_AVAILABLE') {
+               const printJob = event.data as PrintJobAvailableEvent;
+               this._printService.openPrintable(event.connectionId, printJob.jobId);
            }
         });
     }

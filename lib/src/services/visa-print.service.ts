@@ -1,11 +1,16 @@
 import {Injectable} from "@angular/core";
 import {BehaviorSubject, filter, Observable, Subject} from "rxjs";
-import {JobChunkEvent, PrintEvent, PrintJob} from "../models";
-import {Socket} from "socket.io-client";
-import { io } from 'socket.io-client';
-import {ErrorEvent} from "../models/error-event.model";
-import {ManagerOptions} from "socket.io-client/build/esm/manager";
-import {SocketOptions} from "socket.io-client/build/esm/socket";
+import {
+    PrintEvent,
+    PrintJob,
+    ErrorEvent,
+    PrintJobHandledEvent,
+    PrintJobChunkEvent,
+    PrintJobAvailableEvent
+} from "../models";
+import io from 'socket.io-client'
+import * as SocketIOClient from 'socket.io-client'
+import Socket = SocketIOClient.Socket;
 
 export type ConnectionData = {
     host?: string;
@@ -13,13 +18,18 @@ export type ConnectionData = {
     token?: string;
 }
 
+type Printable = {
+    jobId: number;
+    data: string;
+}
+
 export type Connection = {
     id: string;
     socket: Socket;
     event$: Subject<PrintEvent>;
     jobs: Map<number, PrintJob[]>;
+    printables: Printable[];
 }
-
 
 @Injectable({
     providedIn: 'root'
@@ -34,7 +44,7 @@ export type Connection = {
     public connect(data: ConnectionData): Observable<PrintEvent> {
         const printEvents$ = new BehaviorSubject<PrintEvent>(null);
 
-        const socketOptions: Partial<ManagerOptions & SocketOptions> = {
+        const socketOptions: any = {
             transports: ['websocket'],
             timeout: 1000,
             reconnection: true,
@@ -52,18 +62,25 @@ export type Connection = {
         }
 
         const connectionId = `print-connection-${VisaPrintService._connectionCounter++} `;
-        const socket = io(data.host || '', socketOptions);
-        const jobs = new Map<number, PrintJob[]>();
+
+        const host = data.host ? `${data.host}` : '';
+        const socket = io(`${host}?token=${data.token}`, socketOptions);
         const connection: Connection = {
             id: connectionId,
             event$: printEvents$,
             socket: socket,
-            jobs: jobs,
+            jobs: new Map<number, PrintJob[]>(),
+            printables: [],
         };
 
         socket.on('connect', () => {
             this._connections.push(connection);
             printEvents$.next(new PrintEvent({type: 'CONNECTED', connectionId}));
+        });
+
+        socket.on('print_job_handled', (jobId: number) => {
+            connection.printables = connection.printables.filter(printable => printable.jobId !== jobId);
+            printEvents$.next(new PrintEvent({type: 'PRINT_JOB_HANDLED', connectionId, data: new PrintJobHandledEvent({jobId})}));
         });
 
         socket.on('connect_error', (error) => {
@@ -93,7 +110,7 @@ export type Connection = {
             }
 
             ack(true);
-            printEvents$.next(new PrintEvent({type: 'JOB_CHUNK_RECEIVED', connectionId, data: new JobChunkEvent({jobId, chunkId, chunkCount, chunkLength})}));
+            printEvents$.next(new PrintEvent({type: 'PRINT_JOB_CHUNK_RECEIVED', connectionId, data: new PrintJobChunkEvent({jobId, chunkId, chunkCount, chunkLength})}));
             this.handlePrintJob(connection, printJob);
         });
 
@@ -112,7 +129,7 @@ export type Connection = {
     public enablePrinting(connectionId: string): void {
         const connection = this._connections.find(connection => connection.id === connectionId);
         if (connection) {
-            connection.socket.emit('enablePrint', null, (data: boolean) => {
+            connection.socket.emit('enable_print', null, (data: boolean) => {
                 this.initialiseReceiver();
                 connection.event$.next(new PrintEvent({type: 'PRINT_ENABLED', connectionId}));
             });
@@ -122,9 +139,21 @@ export type Connection = {
     public disablePrinting(connectionId: string): void {
         const connection = this._connections.find(connection => connection.id === connectionId);
         if (connection) {
-            connection.socket.emit('disablePrint', null, (data: boolean) => {
+            connection.socket.emit('disable_print', null, (data: boolean) => {
                 connection.event$.next(new PrintEvent({type: 'PRINT_DISABLED', connectionId}));
             });
+        }
+    }
+
+    public openPrintable(connectionId: string, jobId: number): void {
+        const connection = this._connections.find(connection => connection.id === connectionId);
+        if (connection) {
+            const printable = connection.printables.find(printable => printable.jobId === jobId);
+            if (printable) {
+                connection.socket.emit('print_job_handled', printable.jobId);
+                connection.printables = connection.printables.filter(printable => printable.jobId !== jobId);
+                this.openPDF(printable.data);
+            }
         }
     }
 
@@ -155,26 +184,30 @@ export type Connection = {
     }
 
     private processJob(connection: Connection, printJob: PrintJob): void {
-        const chunks = connection.jobs.get(printJob.jobId);
+        const {jobId, chunkCount, fileLength, fileName} = printJob;
+        const chunks = connection.jobs.get(jobId);
         if (chunks) {
             // Remove from jobs
-            connection.jobs.delete(printJob.jobId);
+            connection.jobs.delete(jobId);
 
             // Concatenate all the data
-            if (chunks.length > 0 && chunks.length === printJob.chunkCount) {
+            if (chunks.length > 0 && chunks.length === chunkCount) {
                 const base64 = chunks.reduce((acc, chunk) => {
                     return acc + chunk.data
                 }, '');
 
                 const data = atob(base64);
-                if (data.length === printJob.fileLength) {
-                    this.loadPDF(data);
+                if (data.length === fileLength) {
+                    connection.printables.push({jobId, data})
+                    connection.event$.next(new PrintEvent({type: 'PRINT_JOB_AVAILABLE', connectionId: connection.id, data: new PrintJobAvailableEvent({jobId, fileLength, fileName})}));
+                } else {
+                    connection.event$.next(new PrintEvent({type: 'ERROR', connectionId: connection.id, data: new ErrorEvent({type: 'ERROR', message: 'Processes print data has inconsistent length'})}));
                 }
             }
         }
     }
 
-    private loadPDF(data: string): void {
+    private openPDF(data: string): void {
         // Convert to binary data
         const bytes = new Uint8Array(data.length);
         for (let i = 0; i < data.length; i++) {
