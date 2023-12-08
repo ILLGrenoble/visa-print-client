@@ -1,14 +1,14 @@
 # VISA Print Client
 
-This is an angular library providing a service to manage websocket connections to a [VISA Print Server](https://ILLGrenoble/visa-print-server) and enabling printing of PDF documents from a VISA instance on the user's host computer. This angular module is intended to be integrated into the [VISA front end](https://ILLGrenoble/visa-web)
+This is an angular library providing a service to manage websocket connections to a [VISA Print Server](https://github.com/ILLGrenoble/visa-print-server) and enabling printing of PDF documents from a VISA instance on the user's host computer. This angular module is intended to be integrated into the [VISA front end](https://github.com/ILLGrenoble/visa-web)
 
-The transfer is initially triggered by a request from the [VISA CUPS Driver](https://ILLGrenoble/visa-cups) to the [VISA Print Server](https://ILLGrenoble/visa-print-server) when a user prints a document in an instance. 
+The transfer is initially triggered by a request from the [VISA CUPS Driver](https://github.com/ILLGrenoble/visa-cups) to the [VISA Print Server](https://github.com/ILLGrenoble/visa-print-server) when a user prints a document in an instance. 
 
 PDFs are then sent from the server via the websocket to the client. A notification is received, the user is informed of a print request, and the PDF is rendered in a hidden iframe: after rendering the print dialog is opened from the iframe content.
 
 The user then selects a local printer to print the document or saves the PDF as a local file.
 
-An [authentication proxy](https://ILLGrenoble/visa-jupyter-proxy) is used to ensure that only the owner of an instance can connect to the VISA Print Server and receive print requests.
+An [authentication proxy](https://github.com/ILLGrenoble/visa-jupyter-proxy) is used to ensure that only the owner of an instance can connect to the VISA Print Server and receive print requests.
 
 ## Installation
 
@@ -104,6 +104,6 @@ The connection to the VISA Print Client is configured with a path and a token:
 
   If the server is configured with an accessToken, it can be specified here.
 
-  > Note that the [proxy](https://ILLGrenoble/visa-jupyter-proxy) provides authentication and ensures that only the owner of an instance receives print requests.
+  > Note that the [proxy](https://github.com/ILLGrenoble/visa-jupyter-proxy) provides authentication and ensures that only the owner of an instance receives print requests.
 
 
