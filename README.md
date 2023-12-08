@@ -1,5 +1,7 @@
 # VISA Print Client
 
+[![npm version](https://badge.fury.io/js/%40illgrenoble%2Fvisa-print-client.svg)](https://badge.fury.io/js/%40illgrenoble%2Fvisa-print-client)
+
 This is an angular library providing a service to manage websocket connections to a [VISA Print Server](https://github.com/ILLGrenoble/visa-print-server) and enabling printing of PDF documents from a VISA instance on the user's host computer. This angular module is intended to be integrated into the [VISA front end](https://github.com/ILLGrenoble/visa-web)
 
 The transfer is initially triggered by a request from the [VISA CUPS Driver](https://github.com/ILLGrenoble/visa-cups) to the [VISA Print Server](https://github.com/ILLGrenoble/visa-print-server) when a user prints a document in an instance. 
