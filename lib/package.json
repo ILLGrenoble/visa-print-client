@@ -1,7 +1,7 @@
 {
     "name": "@illgrenoble/visa-print-client",
     "description": "",
-    "version": "1.0.0",
+    "version": "0.9.0",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/ILLGrenoble/visa-print-client.git"
@@ -19,7 +19,8 @@
     ],
     "peerDependencies": {
         "@angular/common": "^16.0.0",
-        "@angular/core": "^16.0.0"
+        "@angular/core": "^16.0.0",
+        "socket.io-client": "^4.7.2"
     },
     "dependencies": {
         "tslib": "^2.3.0"

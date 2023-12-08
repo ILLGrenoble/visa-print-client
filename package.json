@@ -1,7 +1,7 @@
 {
     "name": "@illgrenoble/visa-print-client",
-    "description": "",
-    "version": "1.O.0",
+    "description": "Receives print requests from a VISA instance via the VISA Print Server using a websocket",
+    "version": "0.9.0",
     "scripts": {
         "ng": "ng",
         "start": "ng serve --proxy-config proxy.conf.json",
