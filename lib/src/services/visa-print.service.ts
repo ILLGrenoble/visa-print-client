@@ -74,8 +74,9 @@ export type Connection = {
             printables: [],
         };
 
+        this._connections.push(connection);
+
         socket.on('connect', () => {
-            this._connections.push(connection);
             printEvents$.next(new PrintEvent({type: 'CONNECTED', connectionId}));
         });
 
