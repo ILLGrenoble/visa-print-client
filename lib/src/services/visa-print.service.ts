@@ -42,7 +42,6 @@ export type Connection = {
     private _pdfUrl: string;
 
     public connect(data: ConnectionData): Observable<PrintEvent> {
-        const printEvents$ = new BehaviorSubject<PrintEvent>(null);
 
         const socketOptions: any = {
             transports: ['websocket'],
@@ -65,6 +64,8 @@ export type Connection = {
 
         const host = data.host ? `${data.host}` : '';
         const socket = io(`${host}?token=${data.token}`, socketOptions);
+
+        const printEvents$ = new BehaviorSubject<PrintEvent>(new PrintEvent({type: 'CONNECTING', connectionId}));
         const connection: Connection = {
             id: connectionId,
             event$: printEvents$,
@@ -114,9 +115,7 @@ export type Connection = {
             this.handlePrintJob(connection, printJob);
         });
 
-        return printEvents$.pipe(
-            filter(data => data != null)
-        );
+        return printEvents$;
     }
 
     public disconnect(connectionId: string): void {
@@ -124,6 +123,7 @@ export type Connection = {
         if (connection) {
             connection.socket.disconnect();
         }
+        this._connections = this._connections.filter(connection => connection.id !== connectionId);
     }
 
     public enablePrinting(connectionId: string): void {
