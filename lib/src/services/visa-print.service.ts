@@ -1,10 +1,9 @@
 import {Injectable} from "@angular/core";
-import {BehaviorSubject, filter, Observable, Subject} from "rxjs";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {
     PrintEvent,
     PrintJob,
     ErrorEvent,
-    PrintJobHandledEvent,
     PrintJobChunkEvent,
     PrintJobAvailableEvent
 } from "../models";
@@ -82,7 +81,7 @@ export type Connection = {
 
         socket.on('print_job_handled', (jobId: number) => {
             connection.printables = connection.printables.filter(printable => printable.jobId !== jobId);
-            printEvents$.next(new PrintEvent({type: 'PRINT_JOB_HANDLED', connectionId, data: new PrintJobHandledEvent({jobId})}));
+            printEvents$.next(new PrintEvent({type: 'PRINT_JOB_HANDLED', connectionId, jobId}));
         });
 
         socket.on('connect_error', (error) => {
@@ -90,7 +89,6 @@ export type Connection = {
         });
 
         socket.on('disconnect', () => {
-            this._connections = this._connections.filter(connection => connection.id !== connectionId);
             printEvents$.next(new PrintEvent({type: 'DISCONNECTED', connectionId}));
         });
 
@@ -102,7 +100,15 @@ export type Connection = {
             printEvents$.next(new PrintEvent({type: 'ERROR', connectionId, data: new ErrorEvent({type: 'EXCEPTION', message: e.message})}));
         });
 
-        socket.on('print', (printJob: PrintJob, ack) => {
+        socket.on('print_job_start', (jobId: number) => {
+            printEvents$.next(new PrintEvent({type: 'PRINT_JOB_TRANSFER_STARTED', connectionId, jobId}));
+        });
+
+        socket.on('print_job_end', (jobId: number) => {
+            printEvents$.next(new PrintEvent({type: 'PRINT_JOB_TRANSFER_TERMINATED', connectionId, jobId}));
+        });
+
+        socket.on('print_job_data', (printJob: PrintJob, ack) => {
             const {jobId, chunkId, chunkCount, chunkLength, data} = printJob;
             if (chunkLength !== data.length) {
                 console.error(`printer job data of chunk ${chunkId}/${chunkCount} for job ${jobId} ${printJob.fileName} has incorrect length`)
@@ -112,7 +118,7 @@ export type Connection = {
             }
 
             ack(true);
-            printEvents$.next(new PrintEvent({type: 'PRINT_JOB_CHUNK_RECEIVED', connectionId, data: new PrintJobChunkEvent({jobId, chunkId, chunkCount, chunkLength})}));
+            printEvents$.next(new PrintEvent({type: 'PRINT_JOB_CHUNK_RECEIVED', connectionId, jobId, data: new PrintJobChunkEvent({jobId, chunkId, chunkCount, chunkLength})}));
             this.handlePrintJob(connection, printJob);
         });
 
