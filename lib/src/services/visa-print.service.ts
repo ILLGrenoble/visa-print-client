@@ -171,10 +171,14 @@ export type Connection = {
             document.body.appendChild(this._iframe);
             this._iframe.onload = () => {
                 URL.revokeObjectURL(this._pdfUrl);
-                this._pdfDidOpen = true;
 
                 this._iframe.focus();
-                this._iframe.contentWindow?.print();
+                try {
+                    this._iframe.contentWindow?.print();
+                    this._pdfDidOpen = true;
+
+                } catch (error) {
+                }
             };
         }
     }
