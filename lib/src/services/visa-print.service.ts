@@ -39,6 +39,7 @@ export type Connection = {
 
     private _iframe: HTMLIFrameElement;
     private _pdfUrl: string;
+    private _pdfDidOpen = false;
 
     public connect(data: ConnectionData): Observable<PrintEvent> {
 
@@ -137,7 +138,6 @@ export type Connection = {
         const connection = this._connections.find(connection => connection.id === connectionId);
         if (connection) {
             connection.socket.emit('enable_print', null, (data: boolean) => {
-                this.initialiseReceiver();
                 connection.event$.next(new PrintEvent({type: 'PRINT_ENABLED', connectionId}));
             });
         }
@@ -159,7 +159,7 @@ export type Connection = {
             if (printable) {
                 connection.socket.emit('print_job_handled', printable.jobId);
                 connection.printables = connection.printables.filter(printable => printable.jobId !== jobId);
-                this.openPDF(printable.data);
+                this.openPDF(printable.data, connection, jobId);
             }
         }
     }
@@ -171,6 +171,7 @@ export type Connection = {
             document.body.appendChild(this._iframe);
             this._iframe.onload = () => {
                 URL.revokeObjectURL(this._pdfUrl);
+                this._pdfDidOpen = true;
 
                 this._iframe.focus();
                 this._iframe.contentWindow?.print();
@@ -214,7 +215,7 @@ export type Connection = {
         }
     }
 
-    private openPDF(data: string): void {
+    private openPDF(data: string, connection: Connection, jobId: number): void {
         // Convert to binary data
         const bytes = new Uint8Array(data.length);
         for (let i = 0; i < data.length; i++) {
@@ -223,7 +224,16 @@ export type Connection = {
         const blob = new Blob([bytes], {type: 'application/pdf'});
         this._pdfUrl = URL.createObjectURL(blob);
 
+        this.initialiseReceiver();
+
         // Set the pdf in the iframe
+        this._pdfDidOpen = false;
         this._iframe.src = this._pdfUrl;
+        setTimeout(() => {
+            if (this._pdfDidOpen === false) {
+                connection.event$.next(new PrintEvent({type: 'PRINT_DIALOG_FAILED', connectionId: connection.id}));
+            }
+        }, 200);
+
     }
 }
