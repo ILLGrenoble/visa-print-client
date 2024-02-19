@@ -231,7 +231,7 @@ export type Connection = {
         this._iframe.src = this._pdfUrl;
         setTimeout(() => {
             if (this._pdfDidOpen === false) {
-                connection.event$.next(new PrintEvent({type: 'PRINT_DIALOG_FAILED', connectionId: connection.id}));
+                connection.event$.next(new PrintEvent({type: 'PRINT_DIALOG_FAILED', connectionId: connection.id, jobId}));
             }
         }, 200);
 
