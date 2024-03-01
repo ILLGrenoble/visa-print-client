@@ -10,6 +10,8 @@ import {
 import io from 'socket.io-client'
 import * as SocketIOClient from 'socket.io-client'
 import Socket = SocketIOClient.Socket;
+import {ManagerOptions} from "socket.io-client/build/esm/manager";
+import {SocketOptions} from "socket.io-client/build/esm/socket";
 
 export type ConnectionData = {
     host?: string;
@@ -41,13 +43,14 @@ export type Connection = {
     private _pdfUrl: string;
     private _pdfDidOpen = false;
 
-    public connect(data: ConnectionData): Observable<PrintEvent> {
+    public connect(data: ConnectionData, connectionOptions: Partial<ManagerOptions & SocketOptions>): Observable<PrintEvent> {
 
-        const socketOptions: any = {
+        const socketOptions: Partial<ManagerOptions & SocketOptions> = {
             transports: ['websocket'],
             timeout: 1000,
             reconnection: true,
             reconnectionDelayMax: 10000,
+            ...connectionOptions
         }
 
         if (data.path) {

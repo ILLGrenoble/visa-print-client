@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {PrintJobAvailableEvent, VisaPrintService} from 'lib';
+import {ManagerOptions, SocketOptions} from "socket.io-client";
 
 @Component({
     selector: 'app-root',
@@ -15,7 +16,12 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit() {
-        this._printService.connect({path: '/ws/print', token: 'ABCDEF123456789'}).subscribe(event => {
+        const connectionOptions: Partial<ManagerOptions & SocketOptions> = {
+            reconnectionDelay: 2000,
+            reconnectionAttempts: 4,
+            reconnectionDelayMax: 16000,
+        };
+        this._printService.connect({path: '/ws/print', token: 'ABCDEF123456789'}, connectionOptions).subscribe(event => {
            console.log(`${event.connectionId} ${event.type}`);
            if (event.type === 'CONNECTED') {
                this._connectionId = event.connectionId;
