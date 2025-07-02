@@ -61,12 +61,20 @@ export type Connection = {
             socketOptions.auth = {
                 token: data.token
             };
+            socketOptions.query = {
+                token: data.token
+            }
         }
 
         const connectionId = `print-connection-${VisaPrintService._connectionCounter++} `;
 
-        const host = data.host ? `${data.host}` : '';
-        const socket = io(`${host}?token=${data.token}`, socketOptions);
+        const location = window.location;
+        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const hostname = location.hostname;
+        const port = location.port ? `:${location.port}` : '';
+
+        const host = data.host ? `${data.host}` : `${protocol}//${hostname}${port}`;
+        const socket = io(`${host}`, socketOptions);
 
         const printEvents$ = new BehaviorSubject<PrintEvent>(new PrintEvent({type: 'CONNECTING', connectionId}));
         const connection: Connection = {
