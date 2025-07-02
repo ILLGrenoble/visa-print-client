@@ -43,8 +43,9 @@ export type Connection = {
     private _pdfUrl: string;
     private _pdfDidOpen = false;
 
-    public connect(data: ConnectionData, connectionOptions: Partial<ManagerOptions & SocketOptions>): Observable<PrintEvent> {
+    public connect(data: ConnectionData, connectionOptions?: Partial<ManagerOptions & SocketOptions>): Observable<PrintEvent> {
 
+        connectionOptions = connectionOptions || {};
         const socketOptions: Partial<ManagerOptions & SocketOptions> = {
             transports: ['websocket'],
             timeout: 1000,
